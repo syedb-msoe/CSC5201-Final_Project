@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  upload-service:
+    build: ./services/upload-service
+    container_name: upload-service
+    ports:
+      - "8001:8000"
+    environment:
+      BLOB_CONN_STRING: "mock-blob"
+      EVENTHUB_CONN: "mock-eventhub"
+      EVENTHUB_NAME: "upload-events"
+
+  ml-processing-service:
+    build: ./services/ml-processing-service
+    container_name: ml-processing-service
+    ports:
+      - "8002:8000"
+    environment:
+      EVENTHUB_CONN: "mock-eventhub"
+      EVENTHUB_NAME: "upload-events"
+      FORM_RECOGNIZER_KEY: "mock-key"
+      FORM_RECOGNIZER_ENDPOINT: "mock-endpoint"
+      COSMOS_CONN: "mock-cosmos"
+
+  results-service:
+    build: ./services/results-service
+    container_name: results-service
+    ports:
+      - "8003:8000"
+    environment:
+      COSMOS_CONN: "mock-cosmos"
+
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "8004:8000"
+    environment:
+      JWT_SECRET: "dev-secret"
+
+  admin-service:
+    build: ./services/admin-service
+    container_name: admin-service
+    ports:
+      - "8005:8000"
