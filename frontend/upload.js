@@ -1,9 +1,11 @@
+const API_BASE = "https://uploadservice-xyz.azcontainerapps.io";
+
 async function upload() {
     const fileInput = document.getElementById("file");
     const data = new FormData();
     data.append("file", fileInput.files[0]);
 
-    const res = await fetch("http://localhost:8001/upload", {
+    const res = await fetch(`${API_BASE}/upload`, {
         method: "POST",
         body: data
     });

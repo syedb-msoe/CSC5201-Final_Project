@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Metrics</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+
+    <button onclick="loadStats()">Load Usage Statistics</button>
+
+    <h2>Endpoint Usage</h2>
+    <table id="statsTable" border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Method</th>
+                <th>Count</th>
+                <th>Avg Response Time (ms)</th>
+            </tr>
+        </thead>
+        <tbody id="statsBody">
+            <tr><td colspan="4">Waiting for data...</td></tr>
+        </tbody>
+    </table>
+
+    <h2>Raw JSON</h2>
+    <pre id="rawJson">Waiting for data…</pre>
+
+    <script src="admin.js"></script>
+</body>
+</html>
