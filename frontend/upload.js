@@ -1,4 +1,7 @@
-const API_BASE = "https://uploadservice-xyz.azcontainerapps.io";
+// LOCAL development:
+// const API_BASE_URL = "http://localhost:8001";
+
+const API_BASE = "https://upload-service.jollygrass-3de8a9a7.centralus.azurecontainerapps.io";
 
 async function upload() {
     const fileInput = document.getElementById("file");

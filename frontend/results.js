@@ -4,7 +4,7 @@
 // Azure Container Apps (example):
 // const API_BASE_URL = "https://resultsservice-xyz.azcontainerapps.io";
 
-const API_BASE_URL = "http://localhost:8003"; // change this later
+const API_BASE_URL = "https://results-service.jollygrass-3de8a9a7.centralus.azurecontainerapps.io";
 
 async function loadResults() {
     const docId = document.getElementById("docId").value.trim();

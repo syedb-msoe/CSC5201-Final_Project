@@ -1,10 +1,6 @@
 // LOCAL development:
 // const API_BASE_URL = "http://localhost:8004";
-
-// Azure Container Apps (example):
-// const API_BASE_URL = "https://adminservice-xyz.azcontainerapps.io";
-
-const API_BASE_URL = "http://localhost:8004"; // change this later
+const API_BASE_URL = "https://admin-service.jollygrass-3de8a9a7.centralus.azurecontainerapps.io";
 
 async function loadStats() {
     const url = `${API_BASE_URL}/admin/stats`;
