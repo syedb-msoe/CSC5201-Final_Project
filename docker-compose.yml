@@ -8,7 +8,7 @@ services:
     ports:
       - "8001:8000"
     environment:
-      BLOB_CONN_STRING: "mock-blob"
+      BLOB_CONN_STRING: "blob-connection-string" # Default, overriden by secret within Azure Container App
       EVENTHUB_CONN: "mock-eventhub"
       EVENTHUB_NAME: "upload-events"
 
