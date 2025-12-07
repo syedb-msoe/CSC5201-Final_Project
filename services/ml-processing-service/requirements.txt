@@ -1,3 +1,5 @@
 fastapi
 uvicorn
 pydantic
+azure-eventhub
+azure-storage-blob

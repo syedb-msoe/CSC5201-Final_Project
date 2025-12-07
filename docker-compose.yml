@@ -19,6 +19,7 @@ services:
     ports:
       - "8002:8000"
     environment:
+      BLOB_CONN_STRING: "blob-connection-string"
       EVENTHUB_CONN: "mock-eventhub"
       EVENTHUB_NAME: "upload-events"
       FORM_RECOGNIZER_KEY: "mock-key"
