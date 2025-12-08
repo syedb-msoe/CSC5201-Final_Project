@@ -1,54 +1,40 @@
-import os
-import json
-import logging
+import os, json
 from azure.eventhub import EventHubConsumerClient
 from azure.storage.blob import BlobServiceClient
-from form_recognizer import extract_text
-from cosmos_client import save_result
+from azure.ai.formrecognizer import DocumentAnalysisClient
+from azure.core.credentials import AzureKeyCredential
 
-_CONN_STR = os.getenv("EVENTHUB_CONN")
-_HUB_NAME = os.getenv("EVENTHUB_NAME")
-_CONSUMER_GROUP = os.getenv("CONSUMER_GROUP", "$Default")
+EVENTHUB_CONN = os.getenv("EVENTHUB_CONN")
+EVENTHUB_NAME = os.getenv("EVENTHUB_NAME")
+BLOB_CONN = os.getenv("BLOB_CONN_STRING")
+FORM_KEY = os.getenv("FORM_RECOGNIZER_KEY")
+FORM_ENDPOINT = os.getenv("FORM_RECOGNIZER_ENDPOINT")
+
+blob_service = BlobServiceClient.from_connection_string(BLOB_CONN)
+form_client = DocumentAnalysisClient(FORM_ENDPOINT, AzureKeyCredential(FORM_KEY))
 
 
-def _on_event(partition_context, event):
-    try:
-        body = event.body_as_str(encoding="UTF-8")
-    except Exception:
-        # fallback: try bytes -> decode
-        try:
-            body = b"".join(b for b in event.body).decode("utf-8")
-        except Exception:
-            logging.exception("Failed to decode event body")
-            return
+def on_event(partition_context, event):
+    payload = json.loads(event.body_as_str())
+    container = payload["container"]
+    blob_path = payload["blob_path"]
 
-    try:
-        payload = json.loads(body)
-    except Exception:
-        logging.exception("Event body is not valid JSON: %s", body)
-        return
+    # Download PDF
+    blob = blob_service.get_blob_client(container, blob_path)
+    pdf_bytes = blob.download_blob().readall()
 
-    logging.info("Processing event from partition %s: %s", partition_context.partition_id, payload)
+    # Extract text
+    poller = form_client.begin_analyze_document("prebuilt-read", pdf_bytes)
+    result = poller.result()
 
-    doc_id = payload.get("documentId")
-    blob_url = payload.get("blobUrl")
+    text = "\n".join([line.content for page in result.pages for line in page.lines])
 
-    if not doc_id or not blob_url:
-        logging.warning("Event missing required fields: %s", payload)
-        return
+    # Store output
+    out_container = blob_service.get_container_client("processed")
+    out_blob = out_container.get_blob_client(blob_path + ".txt")
+    out_blob.upload_blob(text, overwrite=True)
 
-    try:
-        extracted = extract_text(blob_url)
-        save_result(doc_id, extracted)
-    except Exception:
-        logging.exception("Failed processing document %s", doc_id)
-        return
-
-    # checkpoint after successful processing
-    try:
-        partition_context.update_checkpoint(event)
-    except Exception:
-        logging.exception("Failed to update checkpoint for partition %s", partition_context.partition_id)
+    partition_context.update_checkpoint(event)
 
 
 def start_event_consumer():
@@ -66,7 +52,7 @@ def start_event_consumer():
 
     try:
         with client:
-            client.receive(on_event=_on_event)
+            client.receive(on_event=on_event)
     except KeyboardInterrupt:
         logging.info("Event consumer stopped by user")
     except Exception:

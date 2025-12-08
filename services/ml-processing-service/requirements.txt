@@ -3,3 +3,4 @@ uvicorn
 pydantic
 azure-eventhub
 azure-storage-blob
+azure-ai-formrecognizer
