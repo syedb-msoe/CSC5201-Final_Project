@@ -21,8 +21,8 @@ def on_event(partition_context, event):
     logger.info("Received event from partition %s", partition_context.partition_id)
     payload = json.loads(event.body_as_str())
     logger.info("Event payload: %s", payload)
-    container = payload["container"]
-    blob_path = payload["blob_path"]
+    container = payload["documentId"]
+    blob_path = payload["blobUrl"]
 
     # Download PDF
     logger.info("Downloading blob '%s' from container '%s'", blob_path, container)

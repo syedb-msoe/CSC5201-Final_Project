@@ -10,6 +10,10 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logging.getLogger().setLevel(logging.INFO)
+logging.getLogger("azure").setLevel(logging.WARNING)
+logging.getLogger("uamqp").setLevel(logging.WARNING)
+logging.getLogger("azure.eventhub").setLevel(logging.WARNING)
+
 app = FastAPI(title="Upload Service")
 
 @app.post("/upload", response_model=UploadResponse)
