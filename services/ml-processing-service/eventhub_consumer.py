@@ -6,6 +6,7 @@ from azure.core.credentials import AzureKeyCredential
 
 EVENTHUB_CONN = os.getenv("EVENTHUB_CONN")
 EVENTHUB_NAME = os.getenv("EVENTHUB_NAME")
+EVENTHUB_CONSUMER_GROUP = os.getenv("CONSUMER_GROUP", "$Default")
 BLOB_CONN = os.getenv("BLOB_CONN_STRING")
 FORM_KEY = os.getenv("FORM_RECOGNIZER_KEY")
 FORM_ENDPOINT = os.getenv("FORM_RECOGNIZER_ENDPOINT")
@@ -50,10 +51,10 @@ def start_event_consumer():
     """
 
     client = EventHubConsumerClient.from_connection_string(
-        _CONN_STR, consumer_group=_CONSUMER_GROUP, eventhub_name=_HUB_NAME
+        EVENTHUB_CONN, consumer_group=EVENTHUB_CONSUMER_GROUP, eventhub_name=EVENTHUB_NAME
     )
 
-    logging.info("Starting Event Hub consumer for hub '%s', group '%s'", _HUB_NAME, _CONSUMER_GROUP)
+    logging.info("Starting Event Hub consumer for hub '%s', group '%s'", _HUB_NAME, EVENTHUB_CONSUMER_GROUP)
 
     try:
         with client:
