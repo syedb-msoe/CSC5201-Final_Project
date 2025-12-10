@@ -4,6 +4,8 @@ from azure.storage.blob import BlobServiceClient
 from azure.ai.formrecognizer import DocumentAnalysisClient
 from azure.core.credentials import AzureKeyCredential
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 EVENTHUB_CONN = os.getenv("EVENTHUB_CONN")
 EVENTHUB_NAME = os.getenv("EVENTHUB_NAME")
 EVENTHUB_CONSUMER_GROUP = os.getenv("CONSUMER_GROUP", "$Default")
@@ -16,26 +18,26 @@ form_client = DocumentAnalysisClient(FORM_ENDPOINT, AzureKeyCredential(FORM_KEY)
 
 
 def on_event(partition_context, event):
-    logging.info("Received event from partition %s", partition_context.partition_id)
+    logger.info("Received event from partition %s", partition_context.partition_id)
     payload = json.loads(event.body_as_str())
-    logging.info("Event payload: %s", payload)
+    logger.info("Event payload: %s", payload)
     container = payload["container"]
     blob_path = payload["blob_path"]
 
     # Download PDF
-    logging.info("Downloading blob '%s' from container '%s'", blob_path, container)
+    logger.info("Downloading blob '%s' from container '%s'", blob_path, container)
     blob = blob_service.get_blob_client(container, blob_path)
     pdf_bytes = blob.download_blob().readall()
 
     # Extract text
-    logging.info("Extracting text from PDF blob")
+    logger.info("Extracting text from PDF blob")
     poller = form_client.begin_analyze_document("prebuilt-read", pdf_bytes)
     result = poller.result()
 
     text = "\n".join([line.content for page in result.pages for line in page.lines])
 
     # Store output
-    logging.info("Uploading extracted text to 'processed' container")
+    logger.info("Uploading extracted text to 'processed' container")
     out_container = blob_service.get_container_client("processed")
     out_blob = out_container.get_blob_client(blob_path + ".txt")
     out_blob.upload_blob(text, overwrite=True)
@@ -50,18 +52,18 @@ def start_event_consumer():
     Optional: `CONSUMER_GROUP` (defaults to `$Default`).
     """
 
-    logging.info("Initializing Event Hub consumer client")
+    logger.info("Initializing Event Hub consumer client")
 
     client = EventHubConsumerClient.from_connection_string(
         EVENTHUB_CONN, consumer_group=EVENTHUB_CONSUMER_GROUP, eventhub_name=EVENTHUB_NAME
     )
 
-    logging.info("Starting Event Hub consumer for hub '%s', group '%s'", EVENTHUB_NAME, EVENTHUB_CONSUMER_GROUP)
+    logger.info("Starting Event Hub consumer for hub '%s', group '%s'", EVENTHUB_NAME, EVENTHUB_CONSUMER_GROUP)
 
     try:
         with client:
             client.receive(on_event=on_event)
     except KeyboardInterrupt:
-        logging.info("Event consumer stopped by user")
+        logger.info("Event consumer stopped by user")
     except Exception:
-        logging.exception("Event consumer stopped with exception")
+        logger.error("Event consumer stopped with exception")

@@ -3,7 +3,13 @@ from azure_blob import upload_to_blob
 from eventhub_producer import send_event
 from models import UploadResponse
 import uuid
+import logging
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logging.getLogger().setLevel(logging.INFO)
 app = FastAPI(title="Upload Service")
 
 @app.post("/upload", response_model=UploadResponse)

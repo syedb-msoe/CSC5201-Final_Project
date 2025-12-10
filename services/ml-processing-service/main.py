@@ -1,7 +1,13 @@
 from fastapi import FastAPI
 from eventhub_consumer import start_event_consumer
 import threading
+import logging
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logging.getLogger().setLevel(logging.INFO)
 app = FastAPI(title="ML Processing Service")
 
 @app.on_event("startup")
