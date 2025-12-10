@@ -1,4 +1,4 @@
-import os, json
+import os, json, logging
 from azure.eventhub import EventHubConsumerClient
 from azure.storage.blob import BlobServiceClient
 from azure.ai.formrecognizer import DocumentAnalysisClient
