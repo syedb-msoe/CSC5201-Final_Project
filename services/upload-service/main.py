@@ -24,7 +24,7 @@ async def upload_document(file: UploadFile = File(...)):
 
     send_event({
     "container": "uploads",
-    "blob_path": f"{doc_id}/{file}"
+    "blob_path": f"{doc_id}/{file.filename}"
     })
 
     return UploadResponse(documentId=doc_id, blobUrl=blob_url)
