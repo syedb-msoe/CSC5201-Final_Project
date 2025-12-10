@@ -1,9 +1,10 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from azure_blob import upload_to_blob
 from eventhub_producer import send_event
 from models import UploadResponse
 import uuid
 import logging
+import json
 
 logging.basicConfig(
     level=logging.INFO,
@@ -17,14 +18,23 @@ logging.getLogger("azure.eventhub").setLevel(logging.WARNING)
 app = FastAPI(title="Upload Service")
 
 @app.post("/upload", response_model=UploadResponse)
-async def upload_document(file: UploadFile = File(...)):
+async def upload_document(file: UploadFile = File(...), languages: str = Form(None)):
     doc_id = str(uuid.uuid4())
 
     blob_url = upload_to_blob(doc_id, file)
 
+    # Parse languages JSON if provided (frontend sends JSON string)
+    langs = []
+    if languages:
+        try:
+            langs = json.loads(languages)
+        except Exception:
+            logging.exception("Failed to parse languages form field; expected JSON list")
+
     send_event({
-    "container": "uploads",
-    "blob_path": f"{doc_id}/{file.filename}"
+        "container": "uploads",
+        "blob_path": f"{doc_id}/{file.filename}",
+        "languages": langs,
     })
 
     return UploadResponse(documentId=doc_id, blobUrl=blob_url)

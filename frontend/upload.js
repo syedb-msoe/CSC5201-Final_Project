@@ -7,6 +7,9 @@ async function upload() {
     const fileInput = document.getElementById("file");
     const data = new FormData();
     data.append("file", fileInput.files[0]);
+    // Collect selected languages
+    const selected = Array.from(document.querySelectorAll('input[name="languages"]:checked')).map(x => x.value);
+    data.append("languages", JSON.stringify(selected));
 
     const res = await fetch(`${API_BASE}/upload`, {
         method: "POST",

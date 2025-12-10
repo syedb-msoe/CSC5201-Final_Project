@@ -5,8 +5,14 @@
 </head>
 <body>
     <h1>Upload a Document</h1>
-    <input id="file" type="file" />
-    <button onclick="upload()">Upload</button>
+        <input id="file" type="file" />
+
+        <div>
+            <label><input type="checkbox" name="languages" value="en" checked /> English</label>
+            <label><input type="checkbox" name="languages" value="es" /> Spanish</label>
+        </div>
+
+        <button onclick="upload()">Upload</button>
     <script src="upload.js"></script>
 </body>
 </html>
