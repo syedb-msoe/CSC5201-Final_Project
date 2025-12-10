@@ -12,10 +12,37 @@ EVENTHUB_CONSUMER_GROUP = os.getenv("CONSUMER_GROUP", "$Default")
 BLOB_CONN = os.getenv("BLOB_CONN_STRING")
 FORM_KEY = os.getenv("FORM_RECOGNIZER_KEY")
 FORM_ENDPOINT = os.getenv("FORM_RECOGNIZER_ENDPOINT")
+TRANSLATOR_KEY = os.getenv("TRANSLATOR_KEY")
+TRANSLATOR_ENDPOINT = os.getenv("TRANSLATOR_ENDPOINT")
 
 blob_service = BlobServiceClient.from_connection_string(BLOB_CONN)
 form_client = DocumentAnalysisClient(FORM_ENDPOINT, AzureKeyCredential(FORM_KEY))
 
+def translate_text(text: str, to_language="es"):
+    """
+    Translate text to the target language using Azure Translator.
+    (Default: Spanish "es")
+    """
+
+    path = "/translate?api-version=3.0&to=" + to_language
+    url = TRANSLATOR_ENDPOINT + path
+
+    headers = {
+        "Ocp-Apim-Subscription-Key": TRANSLATOR_KEY,
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Region": "global"
+    }
+
+    body = [{"text": text}]
+
+    response = requests.post(url, headers=headers, json=body)
+    
+    if response.status_code != 200:
+        logging.error("Translation failed: %s", response.text)
+        return text
+
+    result = response.json()
+    return result[0]["translations"][0]["text"]
 
 def on_event(partition_context, event):
     logger.info("Received event from partition %s", partition_context.partition_id)
@@ -36,13 +63,17 @@ def on_event(partition_context, event):
 
     text = "\n".join([line.content for page in result.pages for line in page.lines])
 
+    # Translate text
+    logger.info("Translating extracted text to English if not already")
+    translated_text = translate_text(text, to_language="en")
+
     # Store output
     logger.info("Uploading extracted text to 'processed' container")
     out_container = blob_service.get_container_client("processed")
     base, _ = os.path.splitext(blob_path)
     text_blob_path = f"{base}.txt"
     out_blob = out_container.get_blob_client(text_blob_path)
-    out_blob.upload_blob(text, overwrite=True)
+    out_blob.upload_blob(translated_text, overwrite=True)
     logger.info("Uploaded extracted text to '%s/%s'", "processed", text_blob_path)
     partition_context.update_checkpoint(event)
 
