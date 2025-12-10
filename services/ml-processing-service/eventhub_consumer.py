@@ -21,8 +21,8 @@ def on_event(partition_context, event):
     logger.info("Received event from partition %s", partition_context.partition_id)
     payload = json.loads(event.body_as_str())
     logger.info("Event payload: %s", payload)
-    container = payload["documentId"]
-    blob_path = payload["blobUrl"]
+    container = payload["container"]
+    blob_path = payload["blob_path"]
 
     # Download PDF
     logger.info("Downloading blob '%s' from container '%s'", blob_path, container)
@@ -39,9 +39,11 @@ def on_event(partition_context, event):
     # Store output
     logger.info("Uploading extracted text to 'processed' container")
     out_container = blob_service.get_container_client("processed")
-    out_blob = out_container.get_blob_client(blob_path + ".txt")
+    base, _ = os.path.splitext(blob_path)
+    text_blob_path = f"{base}.txt"
+    out_blob = out_container.get_blob_client(text_blob_path)
     out_blob.upload_blob(text, overwrite=True)
-
+    logger.info("Uploaded extracted text to '%s/%s'", "processed", text_blob_path)
     partition_context.update_checkpoint(event)
 
 

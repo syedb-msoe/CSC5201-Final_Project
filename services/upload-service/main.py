@@ -20,13 +20,11 @@ app = FastAPI(title="Upload Service")
 async def upload_document(file: UploadFile = File(...)):
     doc_id = str(uuid.uuid4())
 
-    # Upload to Blob (stubbed locally)
     blob_url = upload_to_blob(doc_id, file)
 
-    # Send event to EventHub (stubbed locally)
     send_event({
-        "documentId": doc_id,
-        "blobUrl": blob_url
+    "container": "uploads",
+    "blob_path": f"{doc_id}/{file}"
     })
 
     return UploadResponse(documentId=doc_id, blobUrl=blob_url)
