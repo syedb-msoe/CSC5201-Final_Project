@@ -50,6 +50,8 @@ def start_event_consumer():
     Optional: `CONSUMER_GROUP` (defaults to `$Default`).
     """
 
+    logging.info("Initializing Event Hub consumer client")
+
     client = EventHubConsumerClient.from_connection_string(
         EVENTHUB_CONN, consumer_group=EVENTHUB_CONSUMER_GROUP, eventhub_name=EVENTHUB_NAME
     )
