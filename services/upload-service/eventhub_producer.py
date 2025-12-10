@@ -13,8 +13,11 @@ def send_event(event: dict):
     If `EVENTHUB_CONN` or `EVENTHUB_NAME` are not set, this function logs and returns.
     """
     try:
+        logging.info("Sending event to Event Hub '%s'", _HUB_NAME)
+        logging.info("Connection string (remove after debugging) '%s'", _CONN_STR)
         producer = EventHubProducerClient.from_connection_string(_CONN_STR, eventhub_name=_HUB_NAME)
         event_data = EventData(json.dumps(event))
+        logging.debug("Created EventData: %s", event_data.body_as_str())
         with producer:
             batch = producer.create_batch()
             batch.add(event_data)

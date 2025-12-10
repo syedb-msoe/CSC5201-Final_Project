@@ -15,21 +15,26 @@ form_client = DocumentAnalysisClient(FORM_ENDPOINT, AzureKeyCredential(FORM_KEY)
 
 
 def on_event(partition_context, event):
+    logging.info("Received event from partition %s", partition_context.partition_id)
     payload = json.loads(event.body_as_str())
+    logging.info("Event payload: %s", payload)
     container = payload["container"]
     blob_path = payload["blob_path"]
 
     # Download PDF
+    logging.info("Downloading blob '%s' from container '%s'", blob_path, container)
     blob = blob_service.get_blob_client(container, blob_path)
     pdf_bytes = blob.download_blob().readall()
 
     # Extract text
+    logging.info("Extracting text from PDF blob")
     poller = form_client.begin_analyze_document("prebuilt-read", pdf_bytes)
     result = poller.result()
 
     text = "\n".join([line.content for page in result.pages for line in page.lines])
 
     # Store output
+    logging.info("Uploading extracted text to 'processed' container")
     out_container = blob_service.get_container_client("processed")
     out_blob = out_container.get_blob_client(blob_path + ".txt")
     out_blob.upload_blob(text, overwrite=True)
