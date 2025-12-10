@@ -28,10 +28,12 @@ def translate_text(text: str, to_language="es"):
     path = "/translate?api-version=3.0&to=" + to_language
     url = TRANSLATOR_ENDPOINT + path
 
+    logging.info("Calling translation API at %s", url)
+
     headers = {
         "Ocp-Apim-Subscription-Key": TRANSLATOR_KEY,
         "Content-Type": "application/json",
-        "Ocp-Apim-Subscription-Region": "global"
+        "Ocp-Apim-Subscription-Region": "centralus"
     }
 
     body = [{"text": text}]
