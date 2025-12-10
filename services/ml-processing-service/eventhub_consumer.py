@@ -54,7 +54,7 @@ def start_event_consumer():
         EVENTHUB_CONN, consumer_group=EVENTHUB_CONSUMER_GROUP, eventhub_name=EVENTHUB_NAME
     )
 
-    logging.info("Starting Event Hub consumer for hub '%s', group '%s'", _HUB_NAME, EVENTHUB_CONSUMER_GROUP)
+    logging.info("Starting Event Hub consumer for hub '%s', group '%s'", EVENTHUB_NAME, EVENTHUB_CONSUMER_GROUP)
 
     try:
         with client:
