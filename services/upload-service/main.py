@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, File, Form, Depends
 from azure_blob import upload_to_blob
 from eventhub_producer import send_event
 from models import UploadResponse
+from auth_middleware import get_current_user
 import uuid
 import logging
 import json

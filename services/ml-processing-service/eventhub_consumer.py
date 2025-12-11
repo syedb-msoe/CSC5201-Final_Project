@@ -16,6 +16,8 @@ FORM_KEY = os.getenv("FORM_RECOGNIZER_KEY")
 FORM_ENDPOINT = os.getenv("FORM_RECOGNIZER_ENDPOINT")
 TRANSLATOR_KEY = os.getenv("TRANSLATOR_KEY")
 TRANSLATOR_ENDPOINT = os.getenv("TRANSLATOR_ENDPOINT")
+COSMOS_ENDPOINT = os.getenv("COSMOS_CONN")
+COSMOS_KEY = os.getenv("COSMOS_KEY")
 
 blob_service = BlobServiceClient.from_connection_string(BLOB_CONN)
 form_client = DocumentAnalysisClient(FORM_ENDPOINT, AzureKeyCredential(FORM_KEY))

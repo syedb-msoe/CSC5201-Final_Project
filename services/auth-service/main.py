@@ -1,8 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from models import UserCreate, UserLogin, User
-from utils import hash_password, verify_password, create_access_token
+from utils import hash_password, verify_password, create_access_token, decode_token
 import database
-from auth import get_current_user
 
 app = FastAPI(title="Auth Service")
 
@@ -37,5 +36,8 @@ def login(user: UserLogin):
 
 
 @app.get("/me")
-def me(current: User = Depends(get_current_user)):
-    return current
+def me(token: str):
+    payload = decode_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return payload
