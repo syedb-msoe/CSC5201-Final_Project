@@ -25,6 +25,7 @@ services:
       FORM_RECOGNIZER_KEY: "mock-key"
       FORM_RECOGNIZER_ENDPOINT: "mock-endpoint"
       COSMOS_CONN: "mock-cosmos"
+      COSMOS_KEY: 'mock-cosmos-key'
 
   results-service:
     build: ./services/results-service

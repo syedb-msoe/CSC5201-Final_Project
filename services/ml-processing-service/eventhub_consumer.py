@@ -4,6 +4,7 @@ from azure.eventhub import EventHubConsumerClient
 from azure.storage.blob import BlobServiceClient
 from azure.ai.formrecognizer import DocumentAnalysisClient
 from azure.core.credentials import AzureKeyCredential
+from azure.cosmos import CosmosClient
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -18,6 +19,9 @@ TRANSLATOR_ENDPOINT = os.getenv("TRANSLATOR_ENDPOINT")
 
 blob_service = BlobServiceClient.from_connection_string(BLOB_CONN)
 form_client = DocumentAnalysisClient(FORM_ENDPOINT, AzureKeyCredential(FORM_KEY))
+cosmos = CosmosClient(COSMOS_ENDPOINT, COSMOS_KEY)
+db = cosmos.get_database_client("appdb")
+docs = db.get_container_client("documents")
 
 def translate_text(text: str, to_language="es"):
     """
@@ -39,7 +43,7 @@ def translate_text(text: str, to_language="es"):
     body = [{"text": text}]
 
     response = requests.post(url, headers=headers, json=body)
-    
+
     if response.status_code != 200:
         logging.error("Translation failed: %s", response.text)
         return text
@@ -81,6 +85,15 @@ def on_event(partition_context, event):
             out_blob = out_container.get_blob_client(text_blob_path)
             out_blob.upload_blob(translated_text, overwrite=True)
             logger.info("Uploaded extracted text to '%s/%s'", "processed", text_blob_path)
+
+            # Record in Cosmos DB
+            docs.create_item({
+                "id": str(uuid4()),
+                "userId": event["userId"],
+                "originalBlob": blob_path,
+                "translatedBlob": blob_path + "_es.txt",
+                "status": "processed"
+            })
         except Exception:
             logger.exception("Failed to translate or upload for language %s", lang)
     partition_context.update_checkpoint(event)
