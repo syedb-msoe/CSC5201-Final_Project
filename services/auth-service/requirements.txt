@@ -1,8 +1,8 @@
+passlib
+email-validator
+azure-cosmos
 fastapi
 uvicorn
 python-jose
-passlib[bcrypt]
-azure-cosmos
 pydantic
-email-validator
 python-dotenv
