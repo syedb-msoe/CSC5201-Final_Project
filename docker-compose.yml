@@ -44,6 +44,8 @@ services:
       - "8004:8000"
     environment:
       JWT_SECRET: "dev-secret"
+      COSMOS_CONN: "mock-cosmos"
+      COSMOS_KEY: 'mock-cosmos-key'
 
   admin-service:
     build: ./services/admin-service

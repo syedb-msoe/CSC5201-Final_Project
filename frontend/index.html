@@ -13,6 +13,22 @@
         </div>
 
         <button onclick="upload()">Upload</button>
-    <script src="upload.js"></script>
+        <button id="logoutBtn">Logout</button>
+
+        <script>
+            // Redirect to login if no token present
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = 'login.html';
+            }
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                localStorage.removeItem('access_token');
+                window.location.href = 'login.html';
+            });
+        </script>
+
+        <script src="auth.js"></script>
+        <script src="upload.js"></script>
 </body>
 </html>

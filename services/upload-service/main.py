@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Depends
 from azure_blob import upload_to_blob
 from eventhub_producer import send_event
 from models import UploadResponse
@@ -18,7 +18,7 @@ logging.getLogger("azure.eventhub").setLevel(logging.WARNING)
 app = FastAPI(title="Upload Service")
 
 @app.post("/upload", response_model=UploadResponse)
-async def upload_document(file: UploadFile = File(...), languages: str = Form(None)):
+async def upload_document(file: UploadFile = File(...), languages: str = Form(None), user = Depends(get_current_user)):
     doc_id = str(uuid.uuid4())
 
     blob_url = upload_to_blob(doc_id, file)
@@ -35,6 +35,7 @@ async def upload_document(file: UploadFile = File(...), languages: str = Form(No
         "container": "uploads",
         "blob_path": f"{doc_id}/{file.filename}",
         "languages": langs,
+        "userId": user["id"]
     })
 
     return UploadResponse(documentId=doc_id, blobUrl=blob_url)

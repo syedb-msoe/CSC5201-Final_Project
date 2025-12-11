@@ -89,7 +89,7 @@ def on_event(partition_context, event):
             # Record in Cosmos DB
             docs.create_item({
                 "id": str(uuid4()),
-                "userId": event["userId"],
+                "userId": payload["userId"],
                 "originalBlob": blob_path,
                 "translatedBlob": blob_path + "_es.txt",
                 "status": "processed"

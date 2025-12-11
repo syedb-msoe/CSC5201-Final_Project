@@ -1,4 +1,7 @@
 fastapi
 uvicorn
+python-jose
+passlib[bcrypt]
+azure-cosmos
 pydantic
-PyJWT
+python-dotenv

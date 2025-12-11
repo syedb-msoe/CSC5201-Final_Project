@@ -11,8 +11,10 @@ async function upload() {
     const selected = Array.from(document.querySelectorAll('input[name="languages"]:checked')).map(x => x.value);
     data.append("languages", JSON.stringify(selected));
 
+    const headers = getAuthHeader ? getAuthHeader() : {};
     const res = await fetch(`${API_BASE}/upload`, {
         method: "POST",
+        headers,
         body: data
     });
 

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up</title>
+</head>
+<body>
+    <h1>Sign Up</h1>
+    <form id="signupForm">
+        <div>
+            <label>Email: <input type="email" id="email" required /></label>
+        </div>
+        <div>
+            <label>Password: <input type="password" id="password" required /></label>
+        </div>
+        <button type="submit">Create account</button>
+    </form>
+
+    <p>Already have an account? <a href="login.html">Login</a></p>
+
+    <script src="auth.js"></script>
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                const resp = await authRegister(email, password);
+                alert('Account created. Please login.');
+                window.location.href = 'login.html';
+            } catch (err) {
+                alert('Sign up failed: ' + (err.message || JSON.stringify(err)));
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <form id="loginForm">
+        <div>
+            <label>Email: <input type="email" id="email" required /></label>
+        </div>
+        <div>
+            <label>Password: <input type="password" id="password" required /></label>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+
+    <p>Don't have an account? <a href="signup.html">Sign up</a></p>
+
+    <script src="auth.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                const resp = await authLogin(email, password);
+                // Save token and go to upload
+                localStorage.setItem('access_token', resp.access_token);
+                window.location.href = 'index.html';
+            } catch (err) {
+                alert('Login failed: ' + (err.message || JSON.stringify(err)));
+            }
+        });
+    </script>
+</body>
+</html>
