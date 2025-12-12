@@ -46,7 +46,7 @@ function renderResults(data) {
         div.innerHTML = `
             <h2>${extractFileName(doc.blobPath)}</h2>
             <p><strong>Uploaded:</strong> ${doc.uploadedAt || "Unknown"}</p>
-            <p><strong>Languages:</strong> ${doc.languages?.join(", ") || "None"}</p>
+            <p><strong>Languages:</strong> ${doc.language || "None"}</p>
 
             <h3>Extracted Text</h3>
             <div class="text-block">${doc.processedText || "(No processed text available)"}</div>

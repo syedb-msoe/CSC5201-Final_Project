@@ -92,7 +92,7 @@ def on_event(partition_context, event):
             docs.create_item({
                 "id": str(uuid.uuid4()),
                 "userId": payload["userId"],
-                "updatedAt": str(datetime.now()),
+                "uploadedAt": str(datetime.now()),
                 "language": lang,
                 "originalBlobPath": blob_path,
                 "translatedBlobPath": text_blob_path,

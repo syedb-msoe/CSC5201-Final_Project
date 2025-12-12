@@ -8,7 +8,7 @@ async function upload() {
     const data = new FormData();
     data.append("file", fileInput.files[0]);
     // Collect selected languages
-    const selected = Array.from(document.querySelectorAll('input[name="languages"]:checked')).map(x => x.value);
+    const selected = Array.from(document.getElementById("languages").value);
     data.append("languages", JSON.stringify(selected));
 
     const headers = getAuthHeader ? getAuthHeader() : {};
