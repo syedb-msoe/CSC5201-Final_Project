@@ -11,6 +11,7 @@ services:
       BLOB_CONN_STRING: "blob-connection-string" # Default, overriden by secret within Azure Container App
       EVENTHUB_CONN: "mock-eventhub"
       EVENTHUB_NAME: "upload-events"
+      JWT_SECRET: "dev-secret"
 
   ml-processing-service:
     build: ./services/ml-processing-service
@@ -35,6 +36,7 @@ services:
       - "8003:8000"
     environment:
       COSMOS_CONN: "mock-cosmos"
+      JWT_SECRET: "dev-secret"
 
   auth-service:
     build: ./services/auth-service
@@ -53,3 +55,5 @@ services:
     container_name: admin-service
     ports:
       - "8005:8000"
+    environment:
+      JWT_SECRET: "dev-secret"
