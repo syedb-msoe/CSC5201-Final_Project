@@ -1,7 +1,7 @@
-const API_BASE = "https://<YOUR-RESULTS-SERVICE-URL>"; // Set your Container App URL here
+const API_BASE = "https://results-service.jollygrass-3de8a9a7.centralus.azurecontainerapps.io";
 
 async function loadResults() {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('access_token');
     if (!token) {
         document.getElementById("results").innerHTML =
             "<p class='error'>You are not logged in.</p>";
