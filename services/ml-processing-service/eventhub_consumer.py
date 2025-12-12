@@ -118,7 +118,7 @@ def start_event_consumer():
 
     try:
         with client:
-            client.receive(on_event=on_event)
+            client.receive(on_event=on_event,starting_position="-1")
     except KeyboardInterrupt:
         logger.info("Event consumer stopped by user")
     except Exception:
