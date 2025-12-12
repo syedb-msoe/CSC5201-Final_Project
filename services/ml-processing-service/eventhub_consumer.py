@@ -53,6 +53,19 @@ def translate_text(text: str, to_language="es"):
     result = response.json()
     return result[0]["translations"][0]["text"]
 
+def translate_large_text(text, to_language="es"):
+    chunks = chunk_text(text)
+    translated_chunks = []
+
+    for i, chunk in enumerate(chunks):
+        logger.info(f"Translating chunk {i+1}/{len(chunks)} ({len(chunk)} chars)")
+
+        translated = translate_text(chunk, to_language)
+        translated_chunks.append(translated)
+    
+    return "\n".join(translated_chunks)
+
+
 def on_event(partition_context, event):
     logger.info("Received event from partition %s", partition_context.partition_id)
     payload = json.loads(event.body_as_str())
@@ -79,7 +92,7 @@ def on_event(partition_context, event):
     base, _ = os.path.splitext(blob_path)
     try:
         logger.info("Translating extracted text to '%s'", lang)
-        translated_text = translate_text(text, to_language=lang)
+        translated_text = translate_large_text(text, to_language=lang)
 
         # Store output per language, e.g., folder/filename.en.txt
         text_blob_path = f"{base}.{lang}.txt"
@@ -124,3 +137,16 @@ def start_event_consumer():
         logger.info("Event consumer stopped by user")
     except Exception:
         logger.error("Event consumer stopped with exception")
+
+def chunk_text(text, max_size=4500):
+    chunks = []
+    while len(text) > max_size:
+        # break at nearest sentence end for better quality
+        split_pos = text.rfind('.', 0, max_size)
+        if split_pos == -1:
+            split_pos = max_size
+        chunks.append(text[:split_pos+1])
+        text = text[split_pos+1:]
+    if text:
+        chunks.append(text)
+    return chunks
