@@ -58,7 +58,6 @@ def get_results(user = Depends(get_current_user)):
 
         try:
             blob_client = processed_container.get_blob_client(translated_blob_path)
-            processed_text = blob_client.download_blob().readall().decode("utf-8")
         except Exception as e:
             logging.warning(
                 f"Processed blob missing for {translated_blob_path}: {str(e)}"
@@ -69,7 +68,7 @@ def get_results(user = Depends(get_current_user)):
             "blobPath": translated_blob_path,
             "uploadedAt": doc.get("uploadedAt"),
             "language": doc.get("language", "unknown"),
-            "processedText": processed_text
+            "public_url": blob_client.url
         })
 
     return {

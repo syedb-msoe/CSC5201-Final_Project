@@ -47,9 +47,7 @@ function renderResults(data) {
             <h2>${extractFileName(doc.blobPath)}</h2>
             <p><strong>Uploaded:</strong> ${doc.uploadedAt || "Unknown"}</p>
             <p><strong>Languages:</strong> ${doc.language || "None"}</p>
-
-            <h3>Extracted Text</h3>
-            <div class="text-block">${doc.processedText || "(No processed text available)"}</div>
+            <p><strong>Download Processed File:</strong> <a href="${doc.public_url}" target="_blank">Download</a></p>
         `;
 
         container.appendChild(div);
