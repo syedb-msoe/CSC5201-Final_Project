@@ -49,29 +49,26 @@ def get_results(user = Depends(get_current_user)):
     results = []
 
     for doc in items:
-        blob_path = doc.get("blobPath") or doc.get("originalBlob")
+        translatedBlob = doc.get("translatedBlobPath")
 
         if not blob_path:
             continue
 
-        # The ML-processing service outputs text files named: "<blob_path>.txt"
-        processed_blob_name = blob_path + ".txt"
-
         processed_text = None
 
         try:
-            blob_client = processed_container.get_blob_client(processed_blob_name)
+            blob_client = processed_container.get_blob_client(translatedBlob)
             processed_text = blob_client.download_blob().readall().decode("utf-8")
         except Exception as e:
             logging.warning(
-                f"Processed blob missing for {processed_blob_name}: {str(e)}"
+                f"Processed blob missing for {translatedBlob}: {str(e)}"
             )
 
         results.append({
             "documentId": doc["id"],
             "blobPath": blob_path,
             "uploadedAt": doc.get("uploadedAt"),
-            "languages": doc.get("languages", []),
+            "language": doc.get("language", "unknown"),
             "processedText": processed_text
         })
 

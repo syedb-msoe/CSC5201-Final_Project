@@ -4,6 +4,7 @@ from azure.storage.blob import BlobServiceClient
 from azure.ai.formrecognizer import DocumentAnalysisClient
 from azure.core.credentials import AzureKeyCredential
 from azure.cosmos import CosmosClient
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -91,8 +92,10 @@ def on_event(partition_context, event):
             docs.create_item({
                 "id": str(uuid.uuid4()),
                 "userId": payload["userId"],
-                "originalBlob": blob_path,
-                "translatedBlob": blob_path + "_es.txt",
+                "updatedAt": str(datetime.now()),
+                "language": lang,
+                "originalBlobPath": blob_path,
+                "translatedBlobPath": text_blob_path,
                 "status": "processed"
             })
         except Exception:
