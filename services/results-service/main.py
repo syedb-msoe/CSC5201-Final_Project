@@ -49,24 +49,24 @@ def get_results(user = Depends(get_current_user)):
     results = []
 
     for doc in items:
-        translatedBlob = doc.get("translatedBlobPath")
+        translated_blob_path = doc.get("translatedBlobPath")
 
-        if not blob_path:
+        if not translated_blob_path:
             continue
 
         processed_text = None
 
         try:
-            blob_client = processed_container.get_blob_client(translatedBlob)
+            blob_client = processed_container.get_blob_client(translated_blob_path)
             processed_text = blob_client.download_blob().readall().decode("utf-8")
         except Exception as e:
             logging.warning(
-                f"Processed blob missing for {translatedBlob}: {str(e)}"
+                f"Processed blob missing for {translated_blob_path}: {str(e)}"
             )
 
         results.append({
             "documentId": doc["id"],
-            "blobPath": blob_path,
+            "blobPath": translated_blob_path,
             "uploadedAt": doc.get("uploadedAt"),
             "language": doc.get("language", "unknown"),
             "processedText": processed_text
