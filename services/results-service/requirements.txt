@@ -3,3 +3,4 @@ uvicorn
 pydantic
 azure-storage-blob
 azure-cosmos
+python-jose
