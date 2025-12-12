@@ -2,22 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Document Results</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Your Documents</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            background: #f7f7f7;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .doc-card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        .doc-card h2 {
+            margin-top: 0;
+        }
+        .text-block {
+            background: #f1f1f1;
+            padding: 10px;
+            white-space: pre-wrap;
+            margin-top: 10px;
+            border-radius: 6px;
+        }
+        .error {
+            color: red;
+        }
+        #logout {
+            margin-bottom: 20px;
+            padding: 8px 14px;
+            background: #c0392b;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        #logout:hover {
+            background: #e74c3c;
+        }
+    </style>
 </head>
 <body>
-    <h1>Extracted Document Results</h1>
 
-    <div>
-        <label for="docId">Document ID:</label>
-        <input type="text" id="docId" placeholder="Enter document ID">
-        <button onclick="loadResults()">Load Results</button>
-    </div>
+    <button id="logout">Logout</button>
+    <a href="index.html">Go To Upload Page</a>
+    <h1>Your Uploaded Documents</h1>
 
-    <hr>
-
-    <h2>Raw JSON Output</h2>
-    <pre id="jsonOutput">Waiting for data…</pre>
+    <div id="results"></div>
 
     <script src="results.js"></script>
 </body>

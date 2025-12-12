@@ -1,21 +1,82 @@
-from fastapi import FastAPI, HTTPException
-from cosmos_client import get_result
+import os
+from fastapi import FastAPI, HTTPException, Depends
+from azure.storage.blob import BlobServiceClient
+from azure.cosmos import CosmosClient
+from auth_middleware import get_current_user
 import logging
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
-logging.getLogger().setLevel(logging.INFO)
+
 app = FastAPI(title="Results Service")
 
-@app.get("/results/{documentId}")
-def get_results(documentId: str):
-    result = get_result(documentId)
-    if not result:
-        raise HTTPException(404, "Not found")
-    return result
+COSMOS_ENDPOINT = os.getenv("COSMOS_ENDPOINT")
+COSMOS_KEY = os.getenv("COSMOS_KEY")
+BLOB_CONN = os.getenv("BLOB_CONN_STRING")
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+blob_service = BlobServiceClient.from_connection_string(BLOB_CONN)
+cosmos = CosmosClient(COSMOS_ENDPOINT, COSMOS_KEY)
+
+db = cosmos.get_database_client("appdb")
+docs = db.get_container_client("documents")
+
+processed_container = blob_service.get_container_client("processed")
+
+@app.get("/results")
+def get_results(user = Depends(get_current_user)):
+    """
+    Return all documents belonging to the authenticated user.
+    Also fetch processed text output from Blob Storage.
+    """
+
+    user_id = user["id"]
+
+    # Use a parameterized query (safer & recommended)
+    query = """
+        SELECT * FROM c WHERE c.userId = @uid
+    """
+
+    items = list(
+        docs.query_items(
+            query=query,
+            parameters=[{"name": "@uid", "value": user_id}],
+            enable_cross_partition_query=True
+        )
+    )
+
+    results = []
+
+    for doc in items:
+        blob_path = doc.get("blobPath") or doc.get("originalBlob")
+
+        if not blob_path:
+            continue
+
+        # The ML-processing service outputs text files named: "<blob_path>.txt"
+        processed_blob_name = blob_path + ".txt"
+
+        processed_text = None
+
+        try:
+            blob_client = processed_container.get_blob_client(processed_blob_name)
+            processed_text = blob_client.download_blob().readall().decode("utf-8")
+        except Exception as e:
+            logging.warning(
+                f"Processed blob missing for {processed_blob_name}: {str(e)}"
+            )
+
+        results.append({
+            "documentId": doc["id"],
+            "blobPath": blob_path,
+            "uploadedAt": doc.get("uploadedAt"),
+            "languages": doc.get("languages", []),
+            "processedText": processed_text
+        })
+
+    return {
+        "userId": user_id,
+        "count": len(results),
+        "documents": results
+    }

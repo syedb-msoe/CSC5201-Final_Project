@@ -35,7 +35,9 @@ services:
     ports:
       - "8003:8000"
     environment:
+      BLOB_CONN_STRING: "blob-connection-string"
       COSMOS_CONN: "mock-cosmos"
+      COSMOS_KEY: 'mock-cosmos-key'
       JWT_SECRET: "dev-secret"
 
   auth-service:

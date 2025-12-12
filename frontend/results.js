@@ -1,37 +1,70 @@
-// LOCAL development:
-// const API_BASE_URL = "http://localhost:8003";
-
-// Azure Container Apps (example):
-// const API_BASE_URL = "https://resultsservice-xyz.azcontainerapps.io";
-
-const API_BASE_URL = "https://results-service.jollygrass-3de8a9a7.centralus.azurecontainerapps.io";
+const API_BASE = "https://<YOUR-RESULTS-SERVICE-URL>"; // Set your Container App URL here
 
 async function loadResults() {
-    const docId = document.getElementById("docId").value.trim();
-    if (!docId) {
-        alert("Please enter a document ID");
+    const token = localStorage.getItem("token");
+    if (!token) {
+        document.getElementById("results").innerHTML =
+            "<p class='error'>You are not logged in.</p>";
         return;
     }
 
-    const url = `${API_BASE_URL}/results/${docId}`;
-    console.log("Fetching:", url);
-
     try {
-        const response = await fetch(url);
+        const res = await fetch(`${API_BASE}/results`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
 
-        if (!response.ok) {
-            document.getElementById("jsonOutput").textContent =
-                `Server returned error: ${response.status}`;
+        if (!res.ok) {
+            document.getElementById("results").innerHTML =
+                `<p class='error'>Error: ${res.status} ${res.statusText}</p>`;
             return;
         }
 
-        const data = await response.json();
-
-        document.getElementById("jsonOutput").textContent = 
-            JSON.stringify(data, null, 2);
-
+        const data = await res.json();
+        renderResults(data);
     } catch (err) {
-        document.getElementById("jsonOutput").textContent =
-            "Error fetching results: " + err;
+        document.getElementById("results").innerHTML =
+            `<p class='error'>Failed to load results: ${err}</p>`;
     }
 }
+
+function renderResults(data) {
+    const container = document.getElementById("results");
+
+    if (data.count === 0) {
+        container.innerHTML = "<p>No documents found.</p>";
+        return;
+    }
+
+    container.innerHTML = "";
+
+    data.documents.forEach(doc => {
+        const div = document.createElement("div");
+        div.className = "doc-card";
+
+        div.innerHTML = `
+            <h2>${extractFileName(doc.blobPath)}</h2>
+            <p><strong>Uploaded:</strong> ${doc.uploadedAt || "Unknown"}</p>
+            <p><strong>Languages:</strong> ${doc.languages?.join(", ") || "None"}</p>
+
+            <h3>Extracted Text</h3>
+            <div class="text-block">${doc.processedText || "(No processed text available)"}</div>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+function extractFileName(path) {
+    return path.split("/").pop();
+}
+
+// Logout (clear token)
+document.getElementById("logout").onclick = () => {
+    localStorage.removeItem("token");
+    window.location.href = "index.html";
+};
+
+// Load results immediately
+loadResults();
