@@ -9,7 +9,7 @@ async function upload() {
     data.append("file", fileInput.files[0]);
     // Collect selected languages
     const selected = document.getElementById("languages").value;
-    data.append("language", JSON.stringify(selected));
+    data.append("language", selected);
 
     const headers = getAuthHeader ? getAuthHeader() : {};
     const res = await fetch(`${API_BASE}/upload`, {
