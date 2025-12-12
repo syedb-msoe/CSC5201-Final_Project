@@ -1,5 +1,4 @@
-import os, json, logging
-import requests
+import os, json, logging, requests, uuid
 from azure.eventhub import EventHubConsumerClient
 from azure.storage.blob import BlobServiceClient
 from azure.ai.formrecognizer import DocumentAnalysisClient
@@ -90,7 +89,7 @@ def on_event(partition_context, event):
 
             # Record in Cosmos DB
             docs.create_item({
-                "id": str(uuid4()),
+                "id": str(uuid.uuid4()),
                 "userId": payload["userId"],
                 "originalBlob": blob_path,
                 "translatedBlob": blob_path + "_es.txt",
