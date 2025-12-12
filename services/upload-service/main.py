@@ -19,23 +19,15 @@ logging.getLogger("azure.eventhub").setLevel(logging.WARNING)
 app = FastAPI(title="Upload Service")
 
 @app.post("/upload", response_model=UploadResponse)
-async def upload_document(file: UploadFile = File(...), languages: str = Form(None), user = Depends(get_current_user)):
+async def upload_document(file: UploadFile = File(...), language: str = Form(None), user = Depends(get_current_user)):
     doc_id = str(uuid.uuid4())
 
     blob_url = upload_to_blob(doc_id, file)
 
-    # Parse languages JSON if provided (frontend sends JSON string)
-    langs = []
-    if languages:
-        try:
-            langs = json.loads(languages)
-        except Exception:
-            logging.exception("Failed to parse languages form field; expected JSON list")
-
     send_event({
         "container": "uploads",
         "blob_path": f"{doc_id}/{file.filename}",
-        "languages": langs,
+        "language": language,
         "userId": user["id"]
     })
 

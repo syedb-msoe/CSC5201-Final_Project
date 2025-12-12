@@ -73,33 +73,32 @@ def on_event(partition_context, event):
     text = "\n".join([line.content for page in result.pages for line in page.lines])
 
     # Determine target languages (list). If none provided, default to English ('en')
-    languages = payload.get("languages") or ["en"]
+    lang = payload.get("language") or ["en"]
     out_container = blob_service.get_container_client("processed")
 
     base, _ = os.path.splitext(blob_path)
-    for lang in languages:
-        try:
-            logger.info("Translating extracted text to '%s'", lang)
-            translated_text = translate_text(text, to_language=lang)
+    try:
+        logger.info("Translating extracted text to '%s'", lang)
+        translated_text = translate_text(text, to_language=lang)
 
-            # Store output per language, e.g., folder/filename.en.txt
-            text_blob_path = f"{base}.{lang}.txt"
-            out_blob = out_container.get_blob_client(text_blob_path)
-            out_blob.upload_blob(translated_text, overwrite=True)
-            logger.info("Uploaded extracted text to '%s/%s'", "processed", text_blob_path)
+        # Store output per language, e.g., folder/filename.en.txt
+        text_blob_path = f"{base}.{lang}.txt"
+        out_blob = out_container.get_blob_client(text_blob_path)
+        out_blob.upload_blob(translated_text, overwrite=True)
+        logger.info("Uploaded extracted text to '%s/%s'", "processed", text_blob_path)
 
-            # Record in Cosmos DB
-            docs.create_item({
-                "id": str(uuid.uuid4()),
-                "userId": payload["userId"],
-                "uploadedAt": str(datetime.now()),
-                "language": lang,
-                "originalBlobPath": blob_path,
-                "translatedBlobPath": text_blob_path,
-                "status": "processed"
-            })
-        except Exception:
-            logger.exception("Failed to translate or upload for language %s", lang)
+        # Record in Cosmos DB
+        docs.create_item({
+            "id": str(uuid.uuid4()),
+            "userId": payload["userId"],
+            "uploadedAt": str(datetime.now()),
+            "language": lang,
+            "originalBlobPath": blob_path,
+            "translatedBlobPath": text_blob_path,
+            "status": "processed"
+        })
+    except Exception:
+        logger.exception("Failed to translate or upload for language %s", lang)
     partition_context.update_checkpoint(event)
 
 
