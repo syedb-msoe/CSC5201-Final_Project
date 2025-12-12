@@ -1,5 +1,8 @@
 # CSC5201-Final_Project
 
+## Site Access
+Site can be accessed at this url: https://white-hill-0b99d2510.3.azurestaticapps.net/index.html
+
 ## High Level Architecture Diagram
 ![High Level Diagram](image.png)
 
