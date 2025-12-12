@@ -12,7 +12,7 @@ logging.basicConfig(
 
 app = FastAPI(title="Results Service")
 
-COSMOS_ENDPOINT = os.getenv("COSMOS_ENDPOINT")
+COSMOS_ENDPOINT = os.getenv("COSMOS_CONN")
 COSMOS_KEY = os.getenv("COSMOS_KEY")
 BLOB_CONN = os.getenv("BLOB_CONN_STRING")
 
