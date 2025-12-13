@@ -63,7 +63,7 @@ def get_results(user = Depends(get_current_user)):
                 f"Processed blob missing for {translated_blob_path}: {str(e)}"
             )
         
-        langugages = {"en": "English", "es": "Spanish", "fr": "French", "de": "German", "zh-Hans": "Chinese (Simplified)"}
+        languages = {"en": "English", "es": "Spanish", "fr": "French", "de": "German", "zh-Hans": "Chinese (Simplified)"}
         language_code = doc.get("language", "unknown")
 
         results.append({
