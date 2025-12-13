@@ -2,7 +2,9 @@ from fastapi import FastAPI, HTTPException, Depends
 from models import UserCreate, UserLogin, User
 from utils import hash_password, verify_password, create_access_token, decode_token
 import database
+from azure.monitor.opentelemetry import configure_azure_monitor
 
+configure_azure_monitor()
 app = FastAPI(title="Auth Service")
 
 
@@ -41,3 +43,7 @@ def me(token: str):
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid token")
     return payload
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}

@@ -6,3 +6,9 @@ uvicorn
 python-jose
 pydantic
 python-dotenv
+azure-monitor-opentelemetry==1.6.0
+opentelemetry-api==1.24.0
+opentelemetry-sdk==1.24.0
+opentelemetry-instrumentation==0.45b0
+opentelemetry-instrumentation-fastapi==0.45b0
+opentelemetry-instrumentation-requests==0.45b0
