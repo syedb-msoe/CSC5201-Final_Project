@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from eventhub_consumer import start_event_consumer
 import threading
 import logging
+from azure.monitor.opentelemetry import configure_azure_monitor
 
 logging.basicConfig(
     level=logging.INFO,
@@ -11,6 +12,8 @@ logging.getLogger().setLevel(logging.INFO)
 logging.getLogger("azure").setLevel(logging.WARNING)
 logging.getLogger("uamqp").setLevel(logging.WARNING)
 logging.getLogger("azure.eventhub").setLevel(logging.WARNING)
+
+configure_azure_monitor()
 app = FastAPI(title="ML Processing Service")
 
 @app.on_event("startup")

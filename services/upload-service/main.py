@@ -6,6 +6,7 @@ from auth_middleware import get_current_user
 import uuid
 import logging
 import json
+from azure.monitor.opentelemetry import configure_azure_monitor
 
 logging.basicConfig(
     level=logging.INFO,
@@ -16,6 +17,7 @@ logging.getLogger("azure").setLevel(logging.WARNING)
 logging.getLogger("uamqp").setLevel(logging.WARNING)
 logging.getLogger("azure.eventhub").setLevel(logging.WARNING)
 
+configure_azure_monitor()
 app = FastAPI(title="Upload Service")
 
 @app.post("/upload", response_model=UploadResponse)

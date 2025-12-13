@@ -5,3 +5,8 @@ pydantic
 azure-storage-blob
 azure-eventhub
 python-jose
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation-fastapi
+opentelemetry-instrumentation-requests
+azure-monitor-opentelemetry

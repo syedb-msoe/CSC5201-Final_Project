@@ -4,12 +4,14 @@ from azure.storage.blob import BlobServiceClient
 from azure.cosmos import CosmosClient
 from auth_middleware import get_current_user
 import logging
+from azure.monitor.opentelemetry import configure_azure_monitor
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+configure_azure_monitor()
 app = FastAPI(title="Results Service")
 
 COSMOS_ENDPOINT = os.getenv("COSMOS_CONN")
