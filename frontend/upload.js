@@ -19,5 +19,5 @@ async function upload() {
     });
 
     const json = await res.json();
-    alert(JSON.stringify(json, null, 2));
+    alert('Document uploaded successfully!');
 }

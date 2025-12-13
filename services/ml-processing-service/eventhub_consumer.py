@@ -76,13 +76,13 @@ def on_event(partition_context, event):
 
     # Download PDF
     try:
-    logger.info("Downloading blob '%s' from container '%s'", blob_path, container)
-    blob = blob_service.get_blob_client(container, blob_path)
+        logger.info("Downloading blob '%s' from container '%s'", blob_path, container)
+        blob = blob_service.get_blob_client(container, blob_path)
 
-    if not blob.exists():
-        logger.error(f"Blob '{blob_path}' does not exist in '{container}'. Skipping event.")
-        partition_context.update_checkpoint(event)
-        return
+        if not blob.exists():
+            logger.error(f"Blob '{blob_path}' does not exist in '{container}'. Skipping event.")
+            partition_context.update_checkpoint(event)
+            return
     pdf_bytes = blob.download_blob().readall()
 
     # Extract text
