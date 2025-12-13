@@ -19,12 +19,16 @@ API_KEY = os.getenv("APPINSIGHTS_API_KEY")
 
 @app.get("/admin/stats")
 def get_stats():
+def get_stats():
     url = f"https://api.applicationinsights.io/v1/apps/{APP_ID}/query"
 
     query = """
     requests
-    | summarize count=count(), avg_response_ms=avg(duration)
-      by name, method
+    | summarize
+        count = count(),
+        avg_response_ms = avg(duration)
+      by name
+    | order by count desc
     """
 
     headers = {
@@ -34,11 +38,16 @@ def get_stats():
     r = requests.get(url, params={"query": query}, headers=headers)
     r.raise_for_status()
 
-    data = r.json()["tables"][0]["rows"]
+    table = r.json()["tables"][0]
+    rows = table["rows"]
 
     endpoints = []
-    for name, method, count, avg_ms in data:
-        endpoint = name.split(" ", 1)[1]
+    for name, count, avg_ms in rows:
+        # name looks like: "GET /health"
+        parts = name.split(" ", 1)
+        method = parts[0] if len(parts) > 1 else "UNKNOWN"
+        endpoint = parts[1] if len(parts) > 1 else name
+
         endpoints.append({
             "endpoint": endpoint,
             "method": method,
