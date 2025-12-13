@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from metrics_store import metrics, record
 import logging
 from azure.monitor.opentelemetry import configure_azure_monitor
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 import requests
 import os
 
@@ -13,6 +14,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 configure_azure_monitor()
 app = FastAPI(title="Admin Service")
+FastAPIInstrumentor.instrument_app(app)
 
 APP_ID = os.getenv("APPINSIGHTS_APP_ID")
 API_KEY = os.getenv("APPINSIGHTS_API_KEY")

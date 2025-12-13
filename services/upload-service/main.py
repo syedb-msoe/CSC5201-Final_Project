@@ -7,6 +7,7 @@ import uuid
 import logging
 import json
 from azure.monitor.opentelemetry import configure_azure_monitor
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,6 +20,7 @@ logging.getLogger("azure.eventhub").setLevel(logging.WARNING)
 
 configure_azure_monitor()
 app = FastAPI(title="Upload Service")
+FastAPIInstrumentor.instrument_app(app)
 
 @app.post("/upload", response_model=UploadResponse)
 async def upload_document(file: UploadFile = File(...), language: str = Form(None), user = Depends(get_current_user)):

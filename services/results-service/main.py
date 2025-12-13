@@ -5,6 +5,7 @@ from azure.cosmos import CosmosClient
 from auth_middleware import get_current_user
 import logging
 from azure.monitor.opentelemetry import configure_azure_monitor
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 logging.basicConfig(
     level=logging.INFO,
@@ -13,6 +14,7 @@ logging.basicConfig(
 
 configure_azure_monitor()
 app = FastAPI(title="Results Service")
+FastAPIInstrumentor.instrument_app(app)
 
 COSMOS_ENDPOINT = os.getenv("COSMOS_CONN")
 COSMOS_KEY = os.getenv("COSMOS_KEY")

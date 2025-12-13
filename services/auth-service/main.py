@@ -3,9 +3,11 @@ from models import UserCreate, UserLogin, User
 from utils import hash_password, verify_password, create_access_token, decode_token
 import database
 from azure.monitor.opentelemetry import configure_azure_monitor
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 configure_azure_monitor()
 app = FastAPI(title="Auth Service")
+FastAPIInstrumentor.instrument_app(app)
 
 
 @app.post("/register")

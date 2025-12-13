@@ -3,6 +3,7 @@ from eventhub_consumer import start_event_consumer
 import threading
 import logging
 from azure.monitor.opentelemetry import configure_azure_monitor
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,6 +16,7 @@ logging.getLogger("azure.eventhub").setLevel(logging.WARNING)
 
 configure_azure_monitor()
 app = FastAPI(title="ML Processing Service")
+FastAPIInstrumentor.instrument_app(app)
 
 @app.on_event("startup")
 async def startup_event():
