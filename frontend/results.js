@@ -60,8 +60,8 @@ function extractFileName(path) {
 
 // Logout (clear token)
 document.getElementById("logout").onclick = () => {
-    localStorage.removeItem("token");
-    window.location.href = "index.html";
+    localStorage.removeItem("access_token");
+    window.location.href = "login.html";
 };
 
 // Load results immediately

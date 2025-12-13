@@ -62,12 +62,15 @@ def get_results(user = Depends(get_current_user)):
             logging.warning(
                 f"Processed blob missing for {translated_blob_path}: {str(e)}"
             )
+        
+        langugages = {"en": "English", "es": "Spanish", "fr": "French", "de": "German", "zh-Hans": "Chinese (Simplified)"}
+        language_code = doc.get("language", "unknown")
 
         results.append({
             "documentId": doc["id"],
             "blobPath": translated_blob_path,
             "uploadedAt": doc.get("uploadedAt"),
-            "language": doc.get("language", "unknown"),
+            "language": languages.get(language_code, language_code),
             "public_url": blob_client.url
         })
 
