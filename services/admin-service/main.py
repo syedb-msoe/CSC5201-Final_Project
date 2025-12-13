@@ -26,7 +26,7 @@ def get_stats():
     | summarize
         count = count(),
         avg_response_ms = avg(duration)
-      by name
+      by cloud_RoleName, name
     | order by count desc
     """
 
