@@ -7,9 +7,10 @@ azure-ai-formrecognizer
 azure-ai-translation-text
 azure-cosmos
 requests
-azure-monitor-opentelemetry==1.6.0
+azure-monitor-opentelemetry
 opentelemetry-api==1.25.0
 opentelemetry-sdk==1.25.0
 opentelemetry-instrumentation==0.46b0
-opentelemetry-instrumentation-fastapi==0.46b0
+opentelemetry-instrumentation-fastapi
 opentelemetry-instrumentation-requests==0.46b0
+opentelemetry-instrumentation-asgi
