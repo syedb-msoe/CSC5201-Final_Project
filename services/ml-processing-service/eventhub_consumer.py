@@ -1,4 +1,4 @@
-import os, json, logging, requests, uuid
+import os, json, logging, requests, uuid, time
 from azure.eventhub import EventHubConsumerClient
 from azure.storage.blob import BlobServiceClient
 from azure.ai.formrecognizer import DocumentAnalysisClient
@@ -67,6 +67,7 @@ def translate_large_text(text, to_language="es"):
 
 
 def on_event(partition_context, event):
+    start = time.time()
     logger.info("Received event from partition %s", partition_context.partition_id)
     payload = json.loads(event.body_as_str())
     logger.info("Event payload: %s", payload)
@@ -85,11 +86,13 @@ def on_event(partition_context, event):
     pdf_bytes = blob.download_blob().readall()
 
     # Extract text
+    ocr_start = time.time()
     logger.info("Extracting text from PDF blob")
     poller = form_client.begin_analyze_document("prebuilt-read", pdf_bytes)
     result = poller.result()
 
     text = "\n".join([line.content for page in result.pages for line in page.lines])
+    logger.info("Text Extracted", extra={"duration_ms": (time.time()-ocr_start)*1000})
 
     # Determine target languages (list). If none provided, default to English ('en')
     lang = payload.get("language") or ["en"]
@@ -97,6 +100,7 @@ def on_event(partition_context, event):
 
     base, _ = os.path.splitext(blob_path)
     try:
+        translation_start = time.time()
         logger.info("Translating extracted text to '%s'", lang)
         translated_text = translate_large_text(text, to_language=lang)
 
@@ -104,7 +108,7 @@ def on_event(partition_context, event):
         text_blob_path = f"{base}.{lang}.txt"
         out_blob = out_container.get_blob_client(text_blob_path)
         out_blob.upload_blob(translated_text, overwrite=True)
-        logger.info("Uploaded extracted text to '%s/%s'", "processed", text_blob_path)
+        logger.info("Uploaded translated text to '%s/%s'", "processed", text_blob_path, extra={"duration_ms": (time.time()-translation_start)*1000})
 
         # Record in Cosmos DB
         docs.create_item({
@@ -116,6 +120,8 @@ def on_event(partition_context, event):
             "translatedBlobPath": text_blob_path,
             "status": "processed"
         })
+
+        logger.info("Processing complete", extra={"total_duration_ms": (time.time()-start)*1000, "userId": payload["userId"]})
     except Exception:
         logger.exception("Failed to translate or upload for language %s", lang)
     partition_context.update_checkpoint(event)
