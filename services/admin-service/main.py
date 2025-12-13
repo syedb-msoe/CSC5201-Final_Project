@@ -19,7 +19,6 @@ API_KEY = os.getenv("APPINSIGHTS_API_KEY")
 
 @app.get("/admin/stats")
 def get_stats():
-def get_stats():
     url = f"https://api.applicationinsights.io/v1/apps/{APP_ID}/query"
 
     query = """
