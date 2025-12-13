@@ -7,3 +7,5 @@ opentelemetry-sdk==1.25.0
 opentelemetry-instrumentation==0.46b0
 opentelemetry-instrumentation-fastapi==0.46b0
 opentelemetry-instrumentation-requests==0.46b0
+azure-monitor-query
+azure-identity
