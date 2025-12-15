@@ -25,6 +25,7 @@ def get_stats():
 
     query = """
     requests
+    | where timestamp >= ago(1h)
     | summarize
         count = count(),
         avg_response_ms = avg(duration)
